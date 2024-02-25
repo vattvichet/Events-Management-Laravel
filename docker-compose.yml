@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: 'php artisan serve --host=0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+  # admin_queue:
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: 'php artisan queue:work'
+  #   depends_on:
+  #     - admin_db
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: Events_Management
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: rootroot
+    volumes:
+      - ./../dbdata:/var/lib/mysql
+    ports:
+      - 33066:3306
+  
+  phpmyadmin:
+    restart: always
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
