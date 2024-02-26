@@ -11,6 +11,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class EventController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except([
+            'index',
+            'show',
+        ]);
+    }
     public function index(Request $request)
     {
         $events = QueryBuilder::for(Event::class)
@@ -33,7 +41,9 @@ class EventController extends Controller
 
     public function store(Store_EventRequest $request)
     {
+
         $validated = $request->validated();
+        $validated['user_id'] = $request->user()->id;
         try {
             $event = Event::create($validated);
             return response()->json([
