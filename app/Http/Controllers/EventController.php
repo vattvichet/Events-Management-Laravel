@@ -6,27 +6,26 @@ use App\Http\Requests\Event\Store_EventRequest;
 use App\Http\Requests\Event\Update_EventRequest;
 use App\Models\Event;
 use Exception;
+use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with('user')->with('attendees')->get();
-        return $events;
+        $events = Event::with('user')->with('attendees')->paginate($request['limit']);
+        return response()->json([
+            'message' => 'success',
+            'data' => $events,
+        ], 200);
     }
 
-    public function show($id)
+    public function show(Event $event)
     {
-        $event = Event::with('user')->with('attendees')->find($id);
-        if ($event) {
-            return response()->json([
-                'message' => 'success',
-                'data' => $event,
-            ], 200);
-        }
+        $event->load('user', 'attendees');
         return response()->json([
-            'message' => "Event ID invalid",
-        ], 201);
+            'message' => 'success',
+            'data' => $event,
+        ], 200);
     }
 
     public function store(Store_EventRequest $request)
@@ -46,38 +45,21 @@ class EventController extends Controller
         }
     }
 
-    public function update(Update_EventRequest $request, $id)
+    public function update(Update_EventRequest $request, Event $event)
     {
-        $event = Event::find($id);
         $validated = $request->validated();
-        if ($event) {
-            try {
-                $event->update($validated);
-                return response()->json([
-                    'message' => 'success',
-                    'data' => $event,
-                ], 200);
-            } catch (Exception $e) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $e,
-                ]);
-            }
-        }
+
+        $event->update($validated);
         return response()->json([
-            'message' => "Event ID invalid",
-        ], 201);
+            'message' => 'success',
+            'data' => $event,
+        ]);
     }
 
-    public function destroy($id)
+
+    public function destroy(Event $event)
     {
-        $event = Event::find($id);
-        if ($event) {
-            $event->delete();
-            return response()->json([], 204);
-        }
-        return response()->json([
-            'message' => "Event ID invalid",
-        ], 201);
+        $event->delete();
+        return response(status: 204);
     }
 }
