@@ -7,12 +7,15 @@ use App\Models\Attendee;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Exception;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class AttendeeController extends Controller
 {
     public function index(Event $event, Request $request)
     {
-        $attendees = $event->attendees()->paginate($request['limit']);
+        $attendees =  QueryBuilder::for($event->attendees())
+            ->allowedIncludes(['user'])
+            ->paginate($request['limit']);
         return response()->json(
             $attendees,
             200
