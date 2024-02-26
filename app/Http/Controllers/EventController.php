@@ -18,6 +18,7 @@ class EventController extends Controller
             'index',
             'show',
         ]);
+        $this->authorizeResource(Event::class, 'event');
     }
     public function index(Request $request)
     {
