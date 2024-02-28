@@ -18,6 +18,7 @@ class AttendeeController extends Controller
             'index',
             'show',
         ]);
+        $this->middleware('throttle:api')->only(['store', 'destroy']);
         $this->authorizeResource(Attendee::class, 'attendee');
     }
     public function index(Event $event, Request $request)

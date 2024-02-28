@@ -18,6 +18,7 @@ class EventController extends Controller
             'index',
             'show',
         ]);
+        $this->middleware('throttle:api')->only(['store', 'destroy', 'update']);
         $this->authorizeResource(Event::class, 'event');
     }
     public function index(Request $request)
